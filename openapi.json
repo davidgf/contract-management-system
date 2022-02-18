@@ -1,0 +1,86 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Deel BE Challenge",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Contract": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Contract identifier"
+          },
+          "terms": {
+            "type": "string",
+            "description": "Contract terms"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["new", "in_progress", "terminated"],
+            "description": "Current status of the contract"
+          },
+          "ContractorId": {
+            "type": "integer",
+            "description": "Identifier of the contractor that owns the contract"
+          },
+          "ClientId": {
+            "type": "integer",
+            "description": "Identifier of the client that owns the contract"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/contracts/{id}": {
+      "get": {
+        "description": "Gets a contract by its identifier",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Identifier of the contract",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the profile that owns the contract",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contract"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+}
