@@ -4,24 +4,28 @@ const { sequelize } = require('./model')
 const { getProfile } = require('./middleware/getProfile')
 const app = express()
 const swaggerUi = require('swagger-ui-express')
+const swaggerValidation = require('openapi-validator-middleware')
 const openApiDocument = require('../openapi.json')
+const { getUserContractById } = require('./services/getUserContracts')
+
+swaggerValidation.init('openapi.json')
 
 app.use(bodyParser.json())
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument))
 app.set('sequelize', sequelize)
 app.set('models', sequelize.models)
 
-/**
- * FIX ME!
- * @returns contract by id
- */
-app.get('/contracts/:id', getProfile, async (req, res) => {
-  const { Contract } = req.app.get('models')
+app.get('/contracts/:id', [swaggerValidation.validate, getProfile], async (req, res) => {
   const { id } = req.params
-  const contract = await Contract.findOne({ where: { id } })
+  const contract = await getUserContractById(req.profile.id, id)
   if (!contract) return res.status(404).end()
   res.json(contract)
 })
 
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument))
+app.use((err, req, res, next) => {
+  if (err instanceof swaggerValidation.InputValidationError) {
+    return res.status(400).json({ errors: err.errors })
+  }
+})
 
 module.exports = app
