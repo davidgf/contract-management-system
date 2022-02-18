@@ -6,7 +6,7 @@ const app = express()
 const swaggerUi = require('swagger-ui-express')
 const swaggerValidation = require('openapi-validator-middleware')
 const openApiDocument = require('../openapi.json')
-const { getUserContractById } = require('./services/getUserContracts')
+const { getUserContractById, getUserContracts } = require('./services/getUserContracts')
 
 swaggerValidation.init('openapi.json')
 
@@ -20,6 +20,11 @@ app.get('/contracts/:id', [swaggerValidation.validate, getProfile], async (req, 
   const contract = await getUserContractById(req.profile.id, id)
   if (!contract) return res.status(404).end()
   res.json(contract)
+})
+
+app.get('/contracts', [swaggerValidation.validate, getProfile], async (req, res) => {
+  const contracts = await getUserContracts(req.profile.id)
+  res.json(contracts)
 })
 
 app.use((err, req, res, next) => {
