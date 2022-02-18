@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const { CONTRACT_STATUSES, PROFILE_TYPES } = require('./constants')
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -24,7 +25,7 @@ Profile.init(
       type: Sequelize.DECIMAL(12, 2)
     },
     type: {
-      type: Sequelize.ENUM('client', 'contractor')
+      type: Sequelize.ENUM(PROFILE_TYPES.CLIENT, PROFILE_TYPES.CONTRACTOR)
     }
   },
   {
@@ -41,7 +42,7 @@ Contract.init(
       allowNull: false
     },
     status: {
-      type: Sequelize.ENUM('new', 'in_progress', 'terminated')
+      type: Sequelize.ENUM(CONTRACT_STATUSES.NEW, CONTRACT_STATUSES.IN_PROGRESS, CONTRACT_STATUSES.TERMINATED)
     }
   },
   {
