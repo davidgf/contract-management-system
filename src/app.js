@@ -7,6 +7,7 @@ const swaggerUi = require('swagger-ui-express')
 const swaggerValidation = require('openapi-validator-middleware')
 const openApiDocument = require('../openapi.json')
 const { getUserContractById, getUserContracts } = require('./services/getUserContracts')
+const { getUnpaidJobs } = require('./services/getUserJobs')
 
 swaggerValidation.init('openapi.json')
 
@@ -25,6 +26,11 @@ app.get('/contracts/:id', [swaggerValidation.validate, getProfile], async (req, 
 app.get('/contracts', [swaggerValidation.validate, getProfile], async (req, res) => {
   const contracts = await getUserContracts(req.profile.id)
   res.json(contracts)
+})
+
+app.get('/jobs/unpaid', [swaggerValidation.validate, getProfile], async (req, res) => {
+  const jobs = await getUnpaidJobs(req.profile.id)
+  res.json(jobs)
 })
 
 app.use((err, req, res, next) => {

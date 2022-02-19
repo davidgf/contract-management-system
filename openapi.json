@@ -109,7 +109,25 @@
           }
         }
       }
+    },
+    "/jobs/unpaid": {
+      "get": {
+        "description": "Returns a list of unpaid jobs for a given a user (client or contractor)",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the user",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of unpaid jobs"
+          }
+        }
+      }
     }
-
   }
 }
