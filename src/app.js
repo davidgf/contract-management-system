@@ -3,11 +3,13 @@ const bodyParser = require('body-parser')
 const { sequelize } = require('./model')
 const { getProfile } = require('./middleware/getProfile')
 const app = express()
+const createError = require('http-errors')
 const swaggerUi = require('swagger-ui-express')
 const swaggerValidation = require('openapi-validator-middleware')
 const openApiDocument = require('../openapi.json')
 const { getUserContractById, getUserContracts } = require('./services/getUserContracts')
 const { getUnpaidJobs } = require('./services/getUserJobs')
+const { payJob } = require('./services/payJob')
 
 swaggerValidation.init('openapi.json')
 
@@ -33,9 +35,21 @@ app.get('/jobs/unpaid', [swaggerValidation.validate, getProfile], async (req, re
   res.json(jobs)
 })
 
+app.post('/jobs/:id/pay', [swaggerValidation.validate, getProfile], async (req, res, next) => {
+  try {
+    const job = await payJob(req.profile, req.params.id)
+    res.json(job)
+  } catch (error) {
+    next(error)
+  }
+})
+
 app.use((err, req, res, next) => {
   if (err instanceof swaggerValidation.InputValidationError) {
     return res.status(400).json({ errors: err.errors })
+  }
+  if (createError.isHttpError(err)) {
+    return res.status(err.status).send(err)
   }
 })
 
