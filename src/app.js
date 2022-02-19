@@ -9,6 +9,7 @@ const swaggerValidation = require('openapi-validator-middleware')
 const openApiDocument = require('../openapi.json')
 const { getUserContractById, getUserContracts } = require('./services/getUserContracts')
 const { getUnpaidJobs } = require('./services/getUserJobs')
+const { deposit } = require('./services/depositFunds')
 const { payJob } = require('./services/payJob')
 
 swaggerValidation.init('openapi.json')
@@ -44,13 +45,24 @@ app.post('/jobs/:id/pay', [swaggerValidation.validate, getProfile], async (req, 
   }
 })
 
+app.post('/balances/deposit/:userId', [swaggerValidation.validate, getProfile], async (req, res, next) => {
+  try {
+    const balance = await deposit(req.params.userId, req.body.amount)
+    res.json({ balance })
+  } catch (error) {
+    next(error)
+  }
+})
+
 app.use((err, req, res, next) => {
+  console.log('err: ', err)
   if (err instanceof swaggerValidation.InputValidationError) {
     return res.status(400).json({ errors: err.errors })
   }
   if (createError.isHttpError(err)) {
     return res.status(err.status).send(err)
   }
+  if (err) return res.status(500).send(err.toString())
 })
 
 module.exports = app

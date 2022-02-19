@@ -154,6 +154,48 @@
           }
         }
       }
+    },
+    "/balances/deposit/{userId}": {
+      "post": {
+        "description": "Deposit funds into a client's balance",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "description": "Identifier of the client receiving funds",
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the user",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amount"],
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0.01
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deposit successfully processed"
+          }
+        }
+      }
     }
   }
 }
