@@ -196,6 +196,50 @@
           }
         }
       }
+    },
+    "/admin/best-profession": {
+      "get": {
+        "description": "Gets the profession that earned the most money between two dates",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "description": "Start date",
+            "required": true,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "description": "End date",
+            "required": true,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the profile that owns the contract",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Best profession",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profession": { "type": "string" },
+                    "totalEarned": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

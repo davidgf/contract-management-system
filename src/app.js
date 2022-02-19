@@ -11,6 +11,7 @@ const { getUserContractById, getUserContracts } = require('./services/getUserCon
 const { getUnpaidJobs } = require('./services/getUserJobs')
 const { deposit } = require('./services/depositFunds')
 const { payJob } = require('./services/payJob')
+const { bestProfessionInRange } = require('./services/getBestProfession')
 
 swaggerValidation.init('openapi.json')
 
@@ -52,6 +53,11 @@ app.post('/balances/deposit/:userId', [swaggerValidation.validate, getProfile], 
   } catch (error) {
     next(error)
   }
+})
+
+app.get('/admin/best-profession', [swaggerValidation.validate, getProfile], async (req, res) => {
+  const jobs = await bestProfessionInRange(new Date(req.query.start), new Date(req.query.end))
+  res.json(jobs)
 })
 
 app.use((err, req, res, next) => {
