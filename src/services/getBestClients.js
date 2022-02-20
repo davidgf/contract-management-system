@@ -1,10 +1,13 @@
 const { Op } = require('sequelize')
-const { Job, Contract, Profile } = require('../model')
+const { sequelize, Job, Contract, Profile } = require('../model')
 const { PROFILE_TYPES } = require('../constants')
 
-function getPaidJobsInRangeWithClient (start, end) {
+function getPaidAmountWithClients (start, end, limit) {
   return Job.findAll({
-    attributes: ['price'],
+    attributes: [
+      [sequelize.fn('SUM', sequelize.col('price')), 'paid'],
+      'Contract.ContractorId'
+    ],
     include: {
       model: Contract,
       attributes: ['ClientId'],
@@ -17,37 +20,25 @@ function getPaidJobsInRangeWithClient (start, end) {
         }
       }
     },
-    where: {
-      paymentDate: { [Op.between]: [start, end] }
-    }
+    where: { paymentDate: { [Op.between]: [start, end] } },
+    group: 'Contract.ClientId',
+    order: [[sequelize.fn('SUM', sequelize.col('price')), 'DESC']],
+    limit
   })
 }
 
-function getAmountByClient (jobsWithClient) {
-  return jobsWithClient.reduce((total, job) => {
-    const client = job.Contract.Client
-    if (!total[client.id]) total[client.id] = { paid: 0, fullName: client.fullName }
-    total[client.id].paid += job.price
-    return total
-  }, {})
-}
-
-function getTopEarners (amountsByClient = {}, limit) {
-  const sortedEarners = Object.entries(amountsByClient)
-    .map(el => {
-      const [id, { paid, fullName }] = el
-      return { id, paid, fullName }
-    })
-    .sort((a, b) => b.paid - a.paid)
-    .slice(0, limit)
-  return sortedEarners
+function formatAmountWithClients (amountWithClients) {
+  return amountWithClients.map(el => {
+    const { paid } = el
+    const { id, fullName } = el.Contract.Client
+    return { id, fullName, paid }
+  })
 }
 
 async function bestClientsInRange (start, end, limit = 2) {
-  const paidJobsWithClient = await getPaidJobsInRangeWithClient(start, end)
-  const amountsByClient = getAmountByClient(paidJobsWithClient)
-  const topEarners = getTopEarners(amountsByClient, limit)
-  return topEarners
+  const amountWithClients = await getPaidAmountWithClients(start, end, limit)
+  const formattedClients = formatAmountWithClients(amountWithClients)
+  return formattedClients
 }
 
 module.exports = {
