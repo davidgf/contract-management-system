@@ -1,4 +1,4 @@
-# DEEL BACKEND TASK
+# BACKEND TASK
 
   
 
@@ -6,6 +6,10 @@
 
 
 This backend exercise involves building a Node.js/Express.js app that will serve a REST API. We imagine you should spend around 3 hours at implement this feature.
+
+## Developer notes
+
+A simple frontend to test the API was included in the project. After starting the application, you can open `http://localhost:3001/docs` in your web browser to visit the interactive OpenApi specification of this API.
 
 ## Data Models
 

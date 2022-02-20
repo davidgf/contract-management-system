@@ -51,6 +51,7 @@
     "/contracts/{id}": {
       "get": {
         "description": "Gets a contract by its identifier",
+        "tags": ["Contracts"],
         "parameters": [
           {
             "in": "path",
@@ -84,6 +85,7 @@
     "/contracts": {
       "get": {
         "description": "Returns a list of non terminated contracts belonging to a user (client or contractor)",
+        "tags": ["Contracts"],
         "parameters": [
           {
             "in": "header",
@@ -113,6 +115,7 @@
     "/jobs/unpaid": {
       "get": {
         "description": "Returns a list of unpaid jobs for a given a user (client or contractor)",
+        "tags": ["Jobs"],
         "parameters": [
           {
             "in": "header",
@@ -132,6 +135,7 @@
     "/jobs/{id}/pay": {
       "post": {
         "description": "Pay for a job",
+        "tags": ["Jobs"],
         "parameters": [
           {
             "in": "path",
@@ -158,6 +162,7 @@
     "/balances/deposit/{userId}": {
       "post": {
         "description": "Deposit funds into a client's balance",
+        "tags": ["Balances"],
         "parameters": [
           {
             "in": "path",
@@ -200,6 +205,7 @@
     "/admin/best-profession": {
       "get": {
         "description": "Gets the profession that earned the most money between two dates",
+        "tags": ["Admin"],
         "parameters": [
           {
             "in": "query",
@@ -244,6 +250,7 @@
     "/admin/best-clients": {
       "get": {
         "description": "Returns the clients the paid the most for jobs in the query time period",
+        "tags": ["Admin"],
         "parameters": [
           {
             "in": "query",
