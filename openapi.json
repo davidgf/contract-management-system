@@ -1,0 +1,304 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Deel BE Challenge",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Contract": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Contract identifier"
+          },
+          "terms": {
+            "type": "string",
+            "description": "Contract terms"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["new", "in_progress", "terminated"],
+            "description": "Current status of the contract"
+          },
+          "ContractorId": {
+            "type": "integer",
+            "description": "Identifier of the contractor that owns the contract"
+          },
+          "ClientId": {
+            "type": "integer",
+            "description": "Identifier of the client that owns the contract"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/contracts/{id}": {
+      "get": {
+        "description": "Gets a contract by its identifier",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Identifier of the contract",
+            "required": true,
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the profile that owns the contract",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contract"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts": {
+      "get": {
+        "description": "Returns a list of non terminated contracts belonging to a user (client or contractor)",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the profile that owns the contract",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of contracts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type":"array",
+                  "items": {
+                    "$ref": "#/components/schemas/Contract"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/unpaid": {
+      "get": {
+        "description": "Returns a list of unpaid jobs for a given a user (client or contractor)",
+        "tags": ["Jobs"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the user",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of unpaid jobs"
+          }
+        }
+      }
+    },
+    "/jobs/{id}/pay": {
+      "post": {
+        "description": "Pay for a job",
+        "tags": ["Jobs"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Identifier of the job",
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the user",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment successfully processed"
+          }
+        }
+      }
+    },
+    "/balances/deposit/{userId}": {
+      "post": {
+        "description": "Deposit funds into a client's balance",
+        "tags": ["Balances"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "description": "Identifier of the client receiving funds",
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the user",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amount"],
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0.01
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deposit successfully processed"
+          }
+        }
+      }
+    },
+    "/admin/best-profession": {
+      "get": {
+        "description": "Gets the profession that earned the most money between two dates",
+        "tags": ["Admin"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "description": "Start date",
+            "required": true,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "description": "End date",
+            "required": true,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the profile that owns the contract",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Best profession",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profession": { "type": "string" },
+                    "totalEarned": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/best-clients": {
+      "get": {
+        "description": "Returns the clients the paid the most for jobs in the query time period",
+        "tags": ["Admin"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "description": "Start date",
+            "required": true,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "description": "End date",
+            "required": true,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of clients to be retrieved",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the profile that owns the contract",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Best profession",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "minimum": 1 },
+                    "fullName": { "type": "string" },
+                    "paid": { "type": "number", "minimum": 0 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

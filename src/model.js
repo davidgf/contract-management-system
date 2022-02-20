@@ -1,9 +1,10 @@
-const Sequelize = require('sequelize');
+const Sequelize = require('sequelize')
+const { CONTRACT_STATUSES, PROFILE_TYPES } = require('./constants')
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: './database.sqlite3'
-});
+})
 
 class Profile extends Sequelize.Model {}
 Profile.init(
@@ -16,22 +17,28 @@ Profile.init(
       type: Sequelize.STRING,
       allowNull: false
     },
+    fullName: {
+      type: Sequelize.DataTypes.VIRTUAL,
+      get () {
+        return `${this.firstName} ${this.lastName}`
+      }
+    },
     profession: {
       type: Sequelize.STRING,
       allowNull: false
     },
-    balance:{
-      type:Sequelize.DECIMAL(12,2)
+    balance: {
+      type: Sequelize.DECIMAL(12, 2)
     },
     type: {
-      type: Sequelize.ENUM('client', 'contractor')
+      type: Sequelize.ENUM(PROFILE_TYPES.CLIENT, PROFILE_TYPES.CONTRACTOR)
     }
   },
   {
     sequelize,
     modelName: 'Profile'
   }
-);
+)
 
 class Contract extends Sequelize.Model {}
 Contract.init(
@@ -40,15 +47,15 @@ Contract.init(
       type: Sequelize.TEXT,
       allowNull: false
     },
-    status:{
-      type: Sequelize.ENUM('new','in_progress','terminated')
+    status: {
+      type: Sequelize.ENUM(CONTRACT_STATUSES.NEW, CONTRACT_STATUSES.IN_PROGRESS, CONTRACT_STATUSES.TERMINATED)
     }
   },
   {
     sequelize,
     modelName: 'Contract'
   }
-);
+)
 
 class Job extends Sequelize.Model {}
 Job.init(
@@ -57,15 +64,15 @@ Job.init(
       type: Sequelize.TEXT,
       allowNull: false
     },
-    price:{
-      type: Sequelize.DECIMAL(12,2),
+    price: {
+      type: Sequelize.DECIMAL(12, 2),
       allowNull: false
     },
     paid: {
       type: Sequelize.BOOLEAN,
-      default:false
+      default: false
     },
-    paymentDate:{
+    paymentDate: {
       type: Sequelize.DATE
     }
   },
@@ -73,12 +80,12 @@ Job.init(
     sequelize,
     modelName: 'Job'
   }
-);
+)
 
-Profile.hasMany(Contract, {as :'Contractor',foreignKey:'ContractorId'})
-Contract.belongsTo(Profile, {as: 'Contractor'})
-Profile.hasMany(Contract, {as : 'Client', foreignKey:'ClientId'})
-Contract.belongsTo(Profile, {as: 'Client'})
+Profile.hasMany(Contract, { as: 'Contractor', foreignKey: 'ContractorId' })
+Contract.belongsTo(Profile, { as: 'Contractor' })
+Profile.hasMany(Contract, { as: 'Client', foreignKey: 'ClientId' })
+Contract.belongsTo(Profile, { as: 'Client' })
 Contract.hasMany(Job)
 Job.belongsTo(Contract)
 
@@ -87,4 +94,4 @@ module.exports = {
   Profile,
   Contract,
   Job
-};
+}
