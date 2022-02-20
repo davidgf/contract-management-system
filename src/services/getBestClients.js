@@ -34,12 +34,12 @@ function getAmountByClient (jobsWithClient) {
 
 function getTopEarners (amountsByClient = {}, limit) {
   const sortedEarners = Object.entries(amountsByClient)
-    .sort((a, b) => b[1].paid - a[1].paid)
-    .slice(0, limit)
     .map(el => {
       const [id, { paid, fullName }] = el
       return { id, paid, fullName }
     })
+    .sort((a, b) => b.paid - a.paid)
+    .slice(0, limit)
   return sortedEarners
 }
 
