@@ -240,6 +240,58 @@
           }
         }
       }
+    },
+    "/admin/best-clients": {
+      "get": {
+        "description": "Returns the clients the paid the most for jobs in the query time period",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start",
+            "description": "Start date",
+            "required": true,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "description": "End date",
+            "required": true,
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of clients to be retrieved",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          {
+            "in": "header",
+            "name": "profile_id",
+            "required": true,
+            "description": "Identifier of the profile that owns the contract",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Best profession",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "minimum": 1 },
+                    "fullName": { "type": "string" },
+                    "paid": { "type": "number", "minimum": 0 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

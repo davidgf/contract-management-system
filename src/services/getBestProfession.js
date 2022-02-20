@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 const { Job, Contract, Profile } = require('../model')
-const { CONTRACT_STATUSES } = require('../constants')
+const { PROFILE_TYPES } = require('../constants')
 
 function getPaidJobsInRange (start, end) {
   return Job.findAll({
@@ -13,7 +13,7 @@ function getPaidJobsInRange (start, end) {
         as: 'Contractor',
         attributes: ['profession'],
         where: {
-          type: 'contractor'
+          type: PROFILE_TYPES.CONTRACTOR
         }
       }
     },
@@ -32,8 +32,8 @@ function getAmountByProfession (jobsWithProfession) {
   }, {})
 }
 
-function getTopEarner (amountsByProfession) {
-  return Object.entries(amountsByProfession).sort((a, b) => b[1] - a[2])[0]
+function getTopEarner (amountsByProfession = {}) {
+  return Object.entries(amountsByProfession).sort((a, b) => b[1] - a[1])[0] || [null, null]
 }
 
 async function bestProfessionInRange (start, end) {

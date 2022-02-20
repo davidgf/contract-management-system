@@ -12,6 +12,7 @@ const { getUnpaidJobs } = require('./services/getUserJobs')
 const { deposit } = require('./services/depositFunds')
 const { payJob } = require('./services/payJob')
 const { bestProfessionInRange } = require('./services/getBestProfession')
+const { bestClientsInRange } = require('./services/getBestClients')
 
 swaggerValidation.init('openapi.json')
 
@@ -60,8 +61,12 @@ app.get('/admin/best-profession', [swaggerValidation.validate, getProfile], asyn
   res.json(jobs)
 })
 
+app.get('/admin/best-clients', [swaggerValidation.validate, getProfile], async (req, res) => {
+  const clients = await bestClientsInRange(new Date(req.query.start), new Date(req.query.end), req.query.limit)
+  res.json(clients)
+})
+
 app.use((err, req, res, next) => {
-  console.log('err: ', err)
   if (err instanceof swaggerValidation.InputValidationError) {
     return res.status(400).json({ errors: err.errors })
   }
